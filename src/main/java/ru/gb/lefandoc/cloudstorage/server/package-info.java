@@ -1,1 +1,0 @@
-package ru.gb.lefandoc.cloudstorage.server;
