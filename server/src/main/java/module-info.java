@@ -4,4 +4,5 @@ module server {
     requires io.netty.codec;
     requires org.slf4j;
     requires lombok;
+    requires java.sql;
 }

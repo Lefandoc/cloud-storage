@@ -3,5 +3,6 @@ package ru.gb.lefandoc.cloudstorage.commons.model;
 public enum MessageType {
     FILE,
     LIST,
-    FILE_REQUEST
+    FILE_REQUEST,
+    AUTH
 }
