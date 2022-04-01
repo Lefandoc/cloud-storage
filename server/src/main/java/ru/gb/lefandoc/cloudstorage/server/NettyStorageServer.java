@@ -45,7 +45,7 @@ public class NettyStorageServer {
             log.info("Server started...");
             future.channel().closeFuture().sync(); // block
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(String.valueOf(e));
         } finally {
             auth.shutdownGracefully();
             worker.shutdownGracefully();

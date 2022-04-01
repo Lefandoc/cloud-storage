@@ -9,13 +9,17 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="359.0" prefWidth="602.0" style="-fx-background-color: #878383;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.gb.lefandoc.cloudstorage.client.NettyClientController">
-    <TextField fx:id="clientPath" editable="false" layoutX="14.0" layoutY="22.0" prefHeight="27.0" prefWidth="250.0" />
-   <Button layoutX="236.0" layoutY="22.0" mnemonicParsing="false" onAction="#chooseDirectory" prefHeight="26.0" prefWidth="35.0" text="📂" textAlignment="CENTER">
-      <tooltip>
-         <Tooltip text="Выбрать папку" />
-      </tooltip>
-   </Button>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="359.0" prefWidth="602.0"
+            style="-fx-background-color: #878383;" xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.gb.lefandoc.cloudstorage.client.NettyClientController">
+    <TextField fx:id="clientPath" editable="false" layoutX="14.0" layoutY="22.0" prefHeight="27.0" prefWidth="250.0"/>
+    <Button layoutX="236.0" layoutY="22.0" mnemonicParsing="false" onAction="#chooseDirectory" prefHeight="26.0"
+            prefWidth="35.0" text="📂" textAlignment="CENTER">
+        <tooltip>
+            <Tooltip text="Выбрать папку"/>
+        </tooltip>
+    </Button>
     <!--    <padding>-->
     <!--        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>-->
     <!--    </padding>-->
@@ -23,28 +27,37 @@
     <!--    <Label fx:id="welcomeText"/>-->
     <!--    <Button onAction="#onHelloButtonClick" text="Hello!"/>-->
 
-    <ListView fx:id="clientView" layoutX="14.0" layoutY="48.0" prefHeight="296.0" prefWidth="257.0" />
-    <ListView fx:id="serverView" layoutX="330.0" layoutY="48.0" prefHeight="296.0" prefWidth="257.0" />
-    <TextField fx:id="serverPath" editable="false" layoutX="330.0" layoutY="22.0" prefHeight="26.0" prefWidth="257.0" />
-    <Button layoutX="283.0" layoutY="110.0" mnemonicParsing="false" onAction="#download" prefHeight="26.0" prefWidth="35.0" text="&lt;" textAlignment="CENTER">
+    <ListView fx:id="clientView" layoutX="14.0" layoutY="48.0" prefHeight="296.0" prefWidth="257.0"/>
+    <ListView fx:id="serverView" layoutX="330.0" layoutY="48.0" prefHeight="296.0" prefWidth="257.0"/>
+    <TextField fx:id="serverPath" editable="false" layoutX="330.0" layoutY="22.0" prefHeight="26.0" prefWidth="257.0"/>
+    <Button layoutX="283.0" layoutY="132.0" mnemonicParsing="false" onAction="#download" prefHeight="26.0"
+            prefWidth="35.0" text="&lt;" textAlignment="CENTER">
         <tooltip>
-            <Tooltip text="Скачать выбранный файл" />
-        </tooltip></Button>
-    <Button layoutX="283.0" layoutY="143.0" mnemonicParsing="false" onAction="#upload" prefHeight="26.0" prefWidth="35.0" text="&gt;" textAlignment="CENTER">
-        <tooltip>
-            <Tooltip text="Выгрузить выбранный файл" />
-        </tooltip></Button>
-    <Button layoutX="283.0" layoutY="52.0" mnemonicParsing="false" onAction="#updateClientView" prefHeight="26.0" prefWidth="35.0" text="↻" textAlignment="CENTER">
-        <tooltip>
-            <Tooltip text="Обновить список файлов" />
+            <Tooltip text="Скачать выбранный файл"/>
         </tooltip>
     </Button>
-    <CheckBox fx:id="checkDelete" focusTraversable="false" layoutX="292.0" layoutY="180.0" mnemonicParsing="false">
+    <Button layoutX="283.0" layoutY="165.0" mnemonicParsing="false" onAction="#upload" prefHeight="26.0"
+            prefWidth="35.0" text="&gt;" textAlignment="CENTER">
         <tooltip>
-            <Tooltip hideDelay="150ms" showDelay="100ms" text="Удалять файл после отправки" />
+            <Tooltip text="Выгрузить выбранный файл"/>
+        </tooltip>
+    </Button>
+    <Button layoutX="283.0" layoutY="74.0" mnemonicParsing="false" onAction="#updateClientView" prefHeight="26.0"
+            prefWidth="35.0" text="↻" textAlignment="CENTER">
+        <tooltip>
+            <Tooltip text="Обновить список файлов"/>
+        </tooltip>
+    </Button>
+    <CheckBox fx:id="checkDelete" focusTraversable="false" layoutX="292.0" layoutY="202.0" mnemonicParsing="false">
+        <tooltip>
+            <Tooltip hideDelay="150ms" showDelay="100ms" text="Удалять файл после отправки"/>
         </tooltip>
     </CheckBox>
-    <ImageView fitHeight="18.0" fitWidth="17.0" layoutX="292.0" layoutY="202.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="@free-icon-garbage-158725.png" />
+    <ImageView fitHeight="18.0" fitWidth="17.0" layoutX="292.0" layoutY="224.0" pickOnBounds="true"
+               preserveRatio="true">
+        <Image url="@free-icon-garbage-158725.png"/>
     </ImageView>
+    <Button fx:id="btnLogin" defaultButton="true" layoutX="427.0" layoutY="152.0" mnemonicParsing="false" onAction="#login"
+            prefHeight="26.0" prefWidth="62.0" text="Log in" textAlignment="CENTER">
+    </Button>
 </AnchorPane>

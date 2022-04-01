@@ -6,16 +6,11 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import ru.gb.lefandoc.cloudstorage.commons.model.CloudMessage;
-import ru.gb.lefandoc.cloudstorage.commons.model.FileMessage;
-import ru.gb.lefandoc.cloudstorage.commons.model.FileRequest;
-import ru.gb.lefandoc.cloudstorage.commons.model.ListMessage;
+import ru.gb.lefandoc.cloudstorage.commons.model.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +19,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Slf4j
@@ -34,11 +30,15 @@ public class NettyClientController implements Initializable {
     public TextField clientPath;
     public TextField serverPath;
     public CheckBox checkDelete;
+    public Button btnLogin;
 
     private Path clientDir;
 
     private ObjectEncoderOutputStream oos;
     private ObjectDecoderInputStream ois;
+
+    private String login;
+    private String password;
 
     public void download(ActionEvent actionEvent) throws IOException {
         oos.writeObject(new FileRequest(serverView.getSelectionModel().getSelectedItem()));
@@ -50,6 +50,25 @@ public class NettyClientController implements Initializable {
             Files.delete(clientDir.resolve(clientView.getSelectionModel().getSelectedItem()));
             updateClientView();
         }
+    }
+
+    public void chooseDirectory(ActionEvent actionEvent) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(clientDir.toFile());
+        clientDir = directoryChooser.showDialog(new Stage()).toPath();
+        updateClientView();
+    }
+
+    public void login(ActionEvent actionEvent) throws IOException {
+        AuthDialog dialog = new AuthDialog();
+        dialog.DialogForm();
+        dialog.showAndWait().ifPresent(str -> {
+            String[] s = str.split(" ");
+            login = s[0];
+            password = s[1];
+        });
+        oos.writeObject(new AuthMessage(login, password));
+        System.out.println(login + password);
     }
 
     @FXML
@@ -86,11 +105,12 @@ public class NettyClientController implements Initializable {
                     case LIST:
                         ListMessage lm = (ListMessage) msg;
                         updateServerView(lm);
+                        btnLogin.setVisible(false);
                         break;
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(String.valueOf(e));
         }
     }
 
@@ -126,15 +146,9 @@ public class NettyClientController implements Initializable {
             });
 
         } catch (IOException ioException) {
-            ioException.printStackTrace();
+            log.error(String.valueOf(ioException));
         }
     }
 
-    public void chooseDirectory(ActionEvent actionEvent) {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setInitialDirectory(clientDir.toFile());
-        clientDir = directoryChooser.showDialog(new Stage()).toPath();
-        updateClientView();
-    }
 }
 
