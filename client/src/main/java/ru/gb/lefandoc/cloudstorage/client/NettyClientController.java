@@ -6,7 +6,10 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +22,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Slf4j
@@ -37,18 +39,35 @@ public class NettyClientController implements Initializable {
     private ObjectEncoderOutputStream oos;
     private ObjectDecoderInputStream ois;
 
+    private Boolean isAuth;
     private String login;
     private String password;
 
     public void download(ActionEvent actionEvent) throws IOException {
-        oos.writeObject(new FileRequest(serverView.getSelectionModel().getSelectedItem()));
+        try {
+            if (isAuth) {
+                String serverItem = serverView.getSelectionModel().getSelectedItem();
+                oos.writeObject(new FileRequest(serverItem));
+                log.info("Request {} from server", serverItem);
+            }
+        } catch (NullPointerException e) {
+            log.error(e.getClass().getName() + ": " + e.getMessage());
+        }
     }
 
     public void upload(ActionEvent actionEvent) throws IOException {
-        oos.writeObject(new FileMessage(clientDir.resolve(clientView.getSelectionModel().getSelectedItem())));
-        if (checkDelete.isSelected()) {
-            Files.delete(clientDir.resolve(clientView.getSelectionModel().getSelectedItem()));
-            updateClientView();
+        try {
+            if (isAuth) {
+                String clientItem = clientView.getSelectionModel().getSelectedItem();
+                oos.writeObject(new FileMessage(clientDir.resolve(clientItem)));
+                if (checkDelete.isSelected()) {
+                    Files.delete(clientDir.resolve(clientItem));
+                    updateClientView();
+                }
+                log.info("Send {} to server", clientItem);
+            }
+        } catch (NullPointerException e) {
+            log.error(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
@@ -56,19 +75,26 @@ public class NettyClientController implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(clientDir.toFile());
         clientDir = directoryChooser.showDialog(new Stage()).toPath();
+        if ("serverDir".equals(clientDir.toFile().getName())) {
+            log.error("Access denied - SERVER FOLDER");
+            return;
+        }
         updateClientView();
     }
 
     public void login(ActionEvent actionEvent) throws IOException {
         AuthDialog dialog = new AuthDialog();
         dialog.DialogForm();
-        dialog.showAndWait().ifPresent(str -> {
-            String[] s = str.split(" ");
-            login = s[0];
-            password = s[1];
+        dialog.showAndWait().ifPresent(userChoice -> {
+            if (userChoice.startsWith("ERROR:") || userChoice.startsWith("CANCELLED:")) {
+                log.warn(dialog.getResult());
+                return;
+            }
+            String[] userInput = userChoice.split(" ");
+            login = userInput[0];
+            password = userInput[1];
         });
         oos.writeObject(new AuthMessage(login, password));
-        System.out.println(login + password);
     }
 
     @FXML
@@ -107,10 +133,14 @@ public class NettyClientController implements Initializable {
                         updateServerView(lm);
                         btnLogin.setVisible(false);
                         break;
+                    case AUTH_STATUS:
+                        AuthStatusMessage asm = (AuthStatusMessage) msg;
+                        isAuth = asm.getIsAuth();
+                        break;
                 }
             }
         } catch (Exception e) {
-            log.error(String.valueOf(e));
+            log.error(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
@@ -134,6 +164,8 @@ public class NettyClientController implements Initializable {
                         if (item.equals("...")) {
                             clientDir = Paths.get(clientDir.toFile().getAbsolutePath()).toFile().getParentFile().toPath();
                             updateClientView();
+                        } else if (item.equals("serverDir")) {
+                            log.error("Access denied - SERVER FOLDER");
                         } else {
                             File selected = clientDir.resolve(item).toFile();
                             if (selected.isDirectory()) {
@@ -146,7 +178,7 @@ public class NettyClientController implements Initializable {
             });
 
         } catch (IOException ioException) {
-            log.error(String.valueOf(ioException));
+            log.error(ioException.getClass().getName() + ": " + ioException.getMessage());
         }
     }
 

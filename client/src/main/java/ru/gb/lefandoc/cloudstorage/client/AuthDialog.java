@@ -1,17 +1,9 @@
 package ru.gb.lefandoc.cloudstorage.client;
 
-import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.util.Pair;
-import org.controlsfx.control.action.Action;
 
 public class AuthDialog extends Dialog<String> {
 
@@ -44,12 +36,14 @@ public class AuthDialog extends Dialog<String> {
 
         setResultConverter(dialogButton -> {
             if (dialogButton.getButtonData() == btnOK.getButtonData()) {
-                if (!username.getText().equals("") && !password.getText().equals("")) {
+                if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
                     return username.getText() + " " + password.getText();
-                } else return "error";
+                } else {
+                    return "ERROR: Bad login and/or password";
+                }
             }
             if (dialogButton.getButtonData() == btnCancel.getButtonData()) {
-                return null;
+                return "CANCELLED: User closed Auth dialog";
             }
             return null;
         });

@@ -3,7 +3,7 @@ package ru.gb.lefandoc.cloudstorage.commons.model;
 import lombok.Data;
 
 @Data
-public class AuthMessage implements CloudMessage{
+public class AuthMessage implements CloudMessage {
 
     private final String login;
     private final String password;
