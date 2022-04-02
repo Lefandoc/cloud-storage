@@ -2,19 +2,23 @@ package ru.gb.lefandoc.cloudstorage.server.handler;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Random;
+import java.sql.*;
 
 @Slf4j
 public class JdbcHandler {
 
     private Connection connection;
     private Statement statement;
+
+    public JdbcHandler() {
+        try {
+            connect();
+            createTable();
+            insertAdmin();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void connect() throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:CSDatabase.db");
@@ -31,32 +35,36 @@ public class JdbcHandler {
                 connection.close();
             }
         } catch (SQLException e) {
-            log.error(String.valueOf(e));
+            log.error(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
     public void createTable() throws SQLException {
         try {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS USERS_INFO (" +
-                    "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                    "LOGIN VARCHAR NOT NULL," +
-                    "PASSWORD VARCHAR" +
-                    ");");
-            log.info("Table users_info created or already exists");
+            String sqlCreate = "CREATE TABLE IF NOT EXISTS users_info (\n"
+                    + "	id integer PRIMARY KEY AUTOINCREMENT,\n"
+                    + "	login text NOT NULL,\n"
+                    + "	password text\n"
+                    + ");";
+            statement.executeUpdate(sqlCreate);
         } catch (SQLException e) {
-            log.error(String.valueOf(e));
+            log.error(e.getClass().getName() + ": " + e.getMessage());
             connection.rollback();
         }
+        connection.commit();
+        log.info("Table users_info created or already exists");
     }
 
     public void insertAdmin() throws SQLException {
         try (final PreparedStatement preparedStatement =
-                     connection.prepareStatement("INSERT INTO USERS_INFO(ID, login, password) VALUES (?, ?, ?)")) {
-            preparedStatement.setInt(1, 0);
+                     connection.prepareStatement("INSERT INTO users_info(login, password) VALUES (?, ?)")) {
+            preparedStatement.setString(1, "admin");
             preparedStatement.setString(2, "admin");
-            preparedStatement.setString(3, "111");
             preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            connection.rollback();
         }
+        connection.commit();
     }
 
     public boolean findUser(String name, String password) throws SQLException {

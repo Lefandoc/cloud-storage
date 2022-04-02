@@ -2,7 +2,6 @@ package ru.gb.lefandoc.cloudstorage.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -13,9 +12,6 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.extern.slf4j.Slf4j;
 import ru.gb.lefandoc.cloudstorage.server.handler.CloudMessageHandler;
-import ru.gb.lefandoc.cloudstorage.commons.service.UserNameService;
-
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Slf4j
 public class NettyStorageServer {
@@ -24,15 +20,13 @@ public class NettyStorageServer {
 
         EventLoopGroup auth = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
-        UserNameService userNameService = new UserNameService();
-        ConcurrentLinkedDeque<ChannelHandlerContext> users = new ConcurrentLinkedDeque<>();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(auth, worker)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                        protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline().addLast(
                                     new ObjectEncoder(),
                                     new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
@@ -45,7 +39,8 @@ public class NettyStorageServer {
             log.info("Server started...");
             future.channel().closeFuture().sync(); // block
         } catch (InterruptedException e) {
-            log.error(String.valueOf(e));
+            Thread.currentThread().interrupt();
+            log.error(e.getClass().getName() + ": " + e.getMessage());
         } finally {
             auth.shutdownGracefully();
             worker.shutdownGracefully();

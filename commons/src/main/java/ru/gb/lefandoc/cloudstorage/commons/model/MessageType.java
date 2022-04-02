@@ -4,5 +4,6 @@ public enum MessageType {
     FILE,
     LIST,
     FILE_REQUEST,
-    AUTH
+    AUTH,
+    AUTH_STATUS
 }
